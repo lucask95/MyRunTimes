@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Time Keeper</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+	<div class="container-fluid">
+		<div class="row" id="titlebar">
+			<div class="col-sm-12">
+				<h2>Time Keeper</h2>
+			</div>
+		</div>
+		<div class="row" id="contentarea">
+			<div class="col-sm-12">
+
+				<div class="form-group row">
+					<label for="timeIn" class="col-sm-2 col-form-label">Time</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" id="timeIn" placeholder="ex: 1h12m5s100ms or 1:12:05.1">
+					</div>
+					<div class="col-sm-2">
+						<button class="btn btn-primary" id="goBtn">Insert Time</button>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-12">
+						<h4>Input Array</h4>
+						<h7>Click on a number to remove it.</h7>
+						<p class="outputbox" id="arrayOut"></p>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+	<script src="main.js"></script>
+
+</body>
+
+</html>

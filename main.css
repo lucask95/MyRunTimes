@@ -1,0 +1,40 @@
+#titlebar {
+    padding: 30px;
+    background-color: #262626;
+    color: white;
+}
+
+#contentarea {
+    padding: 50px;
+}
+
+#debug {
+    font-size: .5em;
+}
+
+.outputbox {
+    margin: 10px 0 0 0;
+    padding: 15px;
+    background-color: #efefef;
+    border-radius: 5px;
+}
+
+.numbox {
+    padding: 10px 17px 10px 17px;
+    margin: 2px;
+    border-radius: 2px;
+    display: inline-block;
+    background-color: #3f3f3f;
+    color: white;
+}
+
+.closebox {
+    -webkit-transition: background-color 250ms;
+    -moz-transition: background-color 250ms;
+    -o-transition: background-color 250ms;
+    transition: background-color 250ms;
+}
+
+.closebox:hover {
+    background-color: #c44c4c;
+}
