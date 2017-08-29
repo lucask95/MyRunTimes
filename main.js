@@ -10,6 +10,7 @@ class RunTime {
 
     push(n) {
         this.times.push(n);
+        calcAll();
     }
 
     calcAll() {
@@ -19,16 +20,21 @@ class RunTime {
 
 var runTimes = {};
 
-// should be able to process inputs in HH:MM:SS format, may omit HH: or HH:MM
+// takes string in HH:MM:SS.MS or MM:SS.MS or SS.MS format and returns the value
+// in seconds. Ex: processInput("1:12:05.01") returns 4325.01
 function processInput(inputString) {
-    var timeInMs = 0;
+    var timeInSec = 0;
     var splitString = inputString.split(':');
-    return timeInMs;
+    for (var i = 0; splitString.length > 0; i++)
+        timeInSec += Number(splitString.pop()) * Math.pow(60, i);
+    return timeInSec;
 }
 
 function insertTime() {
     var inputString = $("#timeIn").val();
     var newTime = processInput(inputString);
+    runTimes.push(newTime);
+    updateInfo();
 }
 
 function initialize() {
@@ -36,7 +42,6 @@ function initialize() {
 }
 
 $(document).ready(function(){
-    processInput("1h12m5s");
     initialize();
     $("#goBtn").click(insertTime);
     $("#timeIn").keypress(function(e) { if (e.keyCode == 13) insertTime(); });
