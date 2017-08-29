@@ -1,3 +1,4 @@
+// update this class so that array is sorted as values are inserted
 class RunTime {
     constructor() {
         this.times = [];
@@ -8,20 +9,19 @@ class RunTime {
         this.mode = -1;
 
         // extra variables for helping calculate values
-        this.occurrances = {};
-        this.timesSum = 0;
+        this.occurrances = {}; // helps with mode
+        this.newTime = 0; // helps with max, min, mode
+        this.timesSum = 0; // helps with mean
     }
 
     findMax() {
-        var newTime = this.times[this.times.length-1];
-        if (newTime > this.max)
-            this.max = newTime;
+        if (this.newTime > this.max)
+            this.max = this.newTime;
     }
 
     findMin() {
-        var newTime = this.times[this.times.length-1];
-        if (this.min == -1 || newTime < this.min)
-            this.min = newTime;
+        if (this.min == -1 || this.newTime < this.min)
+            this.min = this.newTime;
     }
 
     calcMean() {
@@ -29,7 +29,7 @@ class RunTime {
     }
 
     findMode() {
-        var newTime = this.times[this.times.length-1];
+        var newTime = this.newTime;
 
         // update key value pair
         if(this.occurrances[newTime] == undefined)
@@ -44,21 +44,22 @@ class RunTime {
     }
 
     findMedian() {
-        this.times.sort();
-        this.median = Math.floor(this.times.length);
+        this.median = this.times[Math.floor((this.times.length)/2)];
     }
 
     calcAll() {
         this.findMax();
         this.findMin();
         this.calcMean();
-        this.findMode();
         this.findMedian();
+        this.findMode();
     }
 
     push(n) {
-        this.times.push(n);
+        // inserts value so array stays sorted during insert. helps with median
+        this.times.splice(_.sortedIndex(this.times, n), 0, n);
         this.timesSum += n;
+        this.newTime = n;
         this.calcAll();
     }
 }
