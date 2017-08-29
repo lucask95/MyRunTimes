@@ -66,7 +66,7 @@ class RunTime {
 
 var runTimes = {};
 
-// takes string in HH:MM:SS.MS or MM:SS.MS or SS.MS format and returns the value
+// takes string in HH:MM:SS or MM:SS or SS format and returns the value
 // in seconds. Ex: processInput("1:12:05.01") returns 4325.01
 function processInput(inputString) {
     var timeInSec = 0;
@@ -76,23 +76,40 @@ function processInput(inputString) {
     return timeInSec;
 }
 
-function updateInfo() {
+// takes time in seconds and returns a string in HH:MM:SS.MS format
+function secondsToString(t) {
+    var timeString = "";
+    timeString += Math.floor(t/3600); //hours
+    t = t % 3600;
+    var minutes = Math.floor(t/60); // minutes
+    timeString += (minutes < 10) ? ":0" + minutes : ":" + minutes;
+    t = Math.round(t % 60);
+    timeString += (t < 10) ? ":0" + t : ":" + t; // seconds
+    return timeString;
+}
 
+function updateInfo() {
+    $("#timesOut").append("<div class=\"runtime\">"+secondsToString(runTimes.newTime)+"</div>");
+    var outputstring = "<ul>" +
+        "<li>Worst Time: " + secondsToString(runTimes.max) + "</li>" +
+        "<li>Best Time: " + secondsToString(runTimes.min) + "</li>" +
+        "<li>Mean Time: " + secondsToString(runTimes.mean) + "</li>" +
+        "<li>Median Time: " + secondsToString(runTimes.median) + "</li>" +
+        "<li>Mode Time: " + secondsToString(runTimes.mode) + "</li>" +
+        "</ul>";
+    $("#infoOut").html(outputstring);
 }
 
 function insertTime() {
     var inputString = $("#timeIn").val();
+    $("#timeIn").val("");
     var newTime = processInput(inputString);
     runTimes.push(newTime);
     updateInfo();
 }
 
-function initialize() {
-    runTimes = new RunTime();
-}
-
 $(document).ready(function(){
-    initialize();
+    runTimes = new RunTime();
     $("#goBtn").click(insertTime);
     $("#timeIn").keypress(function(e) { if (e.keyCode == 13) insertTime(); });
 });
