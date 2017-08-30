@@ -1,5 +1,7 @@
 ul {
     margin-bottom: 0px;
+    padding-left: 10px;
+    list-style: none;
 }
 
 #titlebar {

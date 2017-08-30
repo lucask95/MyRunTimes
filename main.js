@@ -45,6 +45,7 @@ class RunTime {
 
     findMedian() {
         var len = this.times.length;
+        // get average of the two middle values if times is an even length
         if (len % 2 == 0)
             this.median = (this.times[len / 2] + this.times[(len / 2) - 1]) / 2;
         else
@@ -92,6 +93,7 @@ function secondsToString(t) {
     return timeString;
 }
 
+// updates run time history output as well as run time data output
 function updateInfo() {
     $("#timesOut").append("<div class=\"runtime\">" + secondsToString(runTimes.newTime) + "</div>");
     var outputstring = "<ul>" +
@@ -129,6 +131,8 @@ function initializeObject() {
 
     // get data from localStorage
     for (var key in runTimes) {
+        // if the value can be parsed to a number, do so when getting the value,
+        // otherwise, just get the string
         runTimes[key] = Number(localStorage.getItem(key)) ?
             Number(localStorage.getItem(key)) : localStorage.getItem(key);
     }
@@ -137,7 +141,8 @@ function initializeObject() {
     runTimes.times = runTimes.times.split(',').map(Number);
     runTimes.occurrances = JSON.parse(String(runTimes.occurrances));
 
-    // output run history
+    // output run history except for most recent run, which will be appended
+    // after calling updateInfo()
     for (var i = 0; i < runTimes.times.length; i++) {
         if (i < runTimes.times.length - 1)
             $("#timesOut").append("<div class=\"runtime\">" +
