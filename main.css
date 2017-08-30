@@ -1,3 +1,7 @@
+ul {
+    margin-bottom: 0px;
+}
+
 #titlebar {
     padding: 30px;
     background-color: #262626;
@@ -6,10 +10,6 @@
 
 #contentarea {
     padding: 50px;
-}
-
-ul {
-    margin-bottom: 0px;
 }
 
 .outputbox {

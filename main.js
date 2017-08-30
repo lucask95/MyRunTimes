@@ -32,7 +32,7 @@ class RunTime {
         var newTime = this.newTime;
 
         // update key value pair
-        if(this.occurrances[newTime] == undefined)
+        if (this.occurrances[newTime] == undefined)
             this.occurrances[newTime] = 1;
         else
             this.occurrances[newTime]++;
@@ -44,7 +44,11 @@ class RunTime {
     }
 
     findMedian() {
-        this.median = this.times[Math.floor((this.times.length)/2)];
+        var len = this.times.length;
+        if (len % 2 == 0)
+            this.median = (this.times[len / 2] + this.times[(len / 2) - 1]) / 2;
+        else
+            this.median = this.times[Math.floor((len) / 2)];
     }
 
     calcAll() {
@@ -79,25 +83,32 @@ function processInput(inputString) {
 // takes time in seconds and returns a string in HH:MM:SS.MS format
 function secondsToString(t) {
     var timeString = "";
-    timeString += Math.floor(t/3600); //hours
+    timeString += Math.floor(t / 3600); //hours
     t = t % 3600;
-    var minutes = Math.floor(t/60); // minutes
+    var minutes = Math.floor(t / 60); // minutes
     timeString += (minutes < 10) ? ":0" + minutes : ":" + minutes;
-    t = Math.round(t % 60);
+    t = Math.floor(t % 60);
     timeString += (t < 10) ? ":0" + t : ":" + t; // seconds
     return timeString;
 }
 
 function updateInfo() {
-    $("#timesOut").append("<div class=\"runtime\">"+secondsToString(runTimes.newTime)+"</div>");
+    $("#timesOut").append("<div class=\"runtime\">" + secondsToString(runTimes.newTime) + "</div>");
     var outputstring = "<ul>" +
-        "<li>Worst Time: " + secondsToString(runTimes.max) + "</li>" +
-        "<li>Best Time: " + secondsToString(runTimes.min) + "</li>" +
-        "<li>Mean Time: " + secondsToString(runTimes.mean) + "</li>" +
-        "<li>Median Time: " + secondsToString(runTimes.median) + "</li>" +
-        "<li>Mode Time: " + secondsToString(runTimes.mode) + "</li>" +
+        "<li><strong>Worst Time:</strong> " + secondsToString(runTimes.max) + "</li>" +
+        "<li><strong>Best Time:</strong> " + secondsToString(runTimes.min) + "</li>" +
+        "<li><strong>Mean Time:</strong> " + secondsToString(runTimes.mean) + "</li>" +
+        "<li><strong>Median Time:</strong> " + secondsToString(runTimes.median) + "</li>" +
+        "<li><strong>Mode Time:</strong> " + secondsToString(runTimes.mode) + "</li>" +
         "</ul>";
     $("#infoOut").html(outputstring);
+}
+
+function updateCookie() {
+    // put values into localStorage for later use
+    for (var key in runTimes)
+        localStorage.setItem(key, runTimes[key]);
+    localStorage.setItem("occurrances", JSON.stringify(runTimes.occurrances));
 }
 
 function insertTime() {
@@ -108,8 +119,38 @@ function insertTime() {
     updateInfo();
 }
 
-$(document).ready(function(){
+// retrieves values from localStorage so that user can continue
+// from where they left off
+// TODO: Update this so that everything works fine if this is the user's first
+// visit to the page
+function initializeObject() {
     runTimes = new RunTime();
+
+    // get data from localStorage
+    for (var key in runTimes) {
+        runTimes[key] = Number(localStorage.getItem(key)) ?
+            Number(localStorage.getItem(key)) : localStorage.getItem(key);
+    }
+
+    // parse times & occurrances
+    runTimes.times = runTimes.times.split(',').map(Number);
+    runTimes.occurrances = JSON.parse(String(runTimes.occurrances));
+
+    // output run history
+    for (var i = 0; i < runTimes.times.length; i++) {
+        if (i < runTimes.times.length - 1)
+            $("#timesOut").append("<div class=\"runtime\">" +
+                secondsToString(runTimes.times[i]) + "</div>");
+    }
+
+    updateInfo();
+}
+
+$(document).ready(function() {
+    initializeObject();
     $("#goBtn").click(insertTime);
-    $("#timeIn").keypress(function(e) { if (e.keyCode == 13) insertTime(); });
+    $("#timeIn").keypress(function(e) {
+        if (e.keyCode == 13) insertTime();
+    });
+    $(window).bind('beforeunload', updateCookie);
 });
