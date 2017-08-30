@@ -121,10 +121,11 @@ function insertTime() {
 
 // retrieves values from localStorage so that user can continue
 // from where they left off
-// TODO: Update this so that everything works fine if this is the user's first
-// visit to the page
 function initializeObject() {
     runTimes = new RunTime();
+
+    if (!(localStorage.getItem("timesSum")))
+        return;
 
     // get data from localStorage
     for (var key in runTimes) {
