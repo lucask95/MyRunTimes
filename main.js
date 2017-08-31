@@ -114,6 +114,7 @@ function secondsToString(t) {
     return timeString;
 }
 
+// TODO: Put each time into its own div
 function outputHistory() {
     $("#timesOut").html("");
     for (var i = 0; i < runTimes.times.length; i++) {
@@ -136,6 +137,7 @@ function updateInfo() {
     $("#infoOut").html(outputstring);
 }
 
+// TODO: Implement class function that removes the time and recalculates values
 function removeTime(index, time) {
     runTimes.times.splice(index, 1);
     var sortedIndex = runTimes.sortedTimes.indexOf(time);
