@@ -1,4 +1,3 @@
-// update this class so that array is sorted as values are inserted
 class RunTime {
     constructor() {
         this.times = [];
@@ -76,8 +75,26 @@ var runTimes = {};
 function processInput(inputString) {
     var timeInSec = 0;
     var splitString = inputString.split(':');
+
+    // some basic checks to see if input is valid
+    // probably doesn't catch everything
+    for (var i = 0; i < splitString.length; i++) {
+        // remove empty strings from list
+        if (splitString[i] == "") {
+            splitString.splice(i, 1);
+            i--;
+            continue;
+        }
+
+        // check for invalid input
+        if (isNaN(Number(splitString[i])))
+            return -1;
+    }
+
+    // multiplies minutes and hours by the proper values and turns time into sec
     for (var i = 0; splitString.length > 0; i++)
         timeInSec += Number(splitString.pop()) * Math.pow(60, i);
+
     return timeInSec;
 }
 
@@ -106,8 +123,8 @@ function updateInfo() {
     $("#infoOut").html(outputstring);
 }
 
+// puts values into localStorage for use on subsequent visits to the page
 function updateCookie() {
-    // put values into localStorage for later use
     for (var key in runTimes)
         localStorage.setItem(key, runTimes[key]);
     localStorage.setItem("occurrances", JSON.stringify(runTimes.occurrances));
@@ -117,6 +134,10 @@ function insertTime() {
     var inputString = $("#timeIn").val();
     $("#timeIn").val("");
     var newTime = processInput(inputString);
+    if (newTime == -1) {
+        alert("Invalid character in input.");
+        return;
+    }
     runTimes.push(newTime);
     updateInfo();
 }
@@ -126,6 +147,7 @@ function insertTime() {
 function initializeObject() {
     runTimes = new RunTime();
 
+    // if there is nothing in localStorage, then start with a new object
     if (!(localStorage.getItem("timesSum")))
         return;
 
@@ -160,3 +182,8 @@ $(document).ready(function() {
     });
     $(window).bind('beforeunload', updateCookie);
 });
+
+// TODO: Allow for different categories of times (like 1 mile, 13 mile, 26 mile)
+// TODO: Display time history in graph. Possible libraries to use:
+//     chartjs: http://www.chartjs.org/docs/latest/getting-started/
+//     dimplejs: http://dimplejs.org/
