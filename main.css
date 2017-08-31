@@ -4,6 +4,10 @@ ul {
     list-style: none;
 }
 
+canvas {
+    margin-top: 10px;
+}
+
 #titlebar {
     padding: 30px;
     background-color: #262626;

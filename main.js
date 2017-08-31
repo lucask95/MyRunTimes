@@ -1,6 +1,7 @@
 class RunTime {
     constructor() {
         this.times = [];
+        this.sortedTimes = [];
         this.max = -1;
         this.min = -1;
         this.mean = -1;
@@ -43,12 +44,12 @@ class RunTime {
     }
 
     findMedian() {
-        var len = this.times.length;
+        var len = this.sortedTimes.length;
         // get average of the two middle values if times is an even length
         if (len % 2 == 0)
-            this.median = (this.times[len / 2] + this.times[(len / 2) - 1]) / 2;
+            this.median = (this.sortedTimes[len / 2] + this.sortedTimes[(len / 2) - 1]) / 2;
         else
-            this.median = this.times[Math.floor((len) / 2)];
+            this.median = this.sortedTimes[Math.floor((len) / 2)];
     }
 
     calcAll() {
@@ -61,7 +62,8 @@ class RunTime {
 
     push(n) {
         // inserts value so array stays sorted during insert. helps with median
-        this.times.splice(_.sortedIndex(this.times, n), 0, n);
+        this.sortedTimes.splice(_.sortedIndex(this.times, n), 0, n);
+        this.times.push(n);
         this.timesSum += n;
         this.newTime = n;
         this.calcAll();
@@ -69,6 +71,8 @@ class RunTime {
 }
 
 var runTimes = {};
+var ctx;
+var myChart = {};
 
 // takes string in HH:MM:SS or MM:SS or SS format and returns the value
 // in seconds. Ex: processInput("1:12:05.01") returns 4325.01
@@ -139,6 +143,7 @@ function insertTime() {
         return;
     }
     runTimes.push(newTime);
+    console.log(runTimes.times);
     updateInfo();
 }
 
@@ -160,6 +165,7 @@ function initializeObject() {
     }
 
     // parse times & occurrances
+    runTimes.sortedTimes = runTimes.times.split(',').map(Number);
     runTimes.times = runTimes.times.split(',').map(Number);
     runTimes.occurrances = JSON.parse(String(runTimes.occurrances));
 
@@ -174,13 +180,57 @@ function initializeObject() {
     updateInfo();
 }
 
+function updateChart() {
+    /*
+    console.log(runTimes.times);
+    var tempData =  _.cloneDeep(runTimes.times);
+    var tempLabels = [];
+    for (var i = 0; i < runTimes.times.length; i++)
+        tempLabels.push(String(i+1));
+
+    myChart.data.datasets[0].data = tempData;
+    myChart.labels = tempLabels;
+    myChart.update();
+    */
+}
+
+function drawChart() {
+    // initialize values that chart uses
+    var tempData = _.cloneDeep(runTimes.times);
+    var tempLabels = [];
+    for (var i = 0; i < runTimes.times.length; i++)
+        tempLabels.push(String(i+1));
+
+    // initialize chart with data
+    ctx = document.getElementById('myChart').getContext('2d');
+    myChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: tempLabels,
+            datasets: [{
+                label: "Run Time History",
+                backgroundColor: 'rgba(0, 0, 0, 0)',
+                borderColor: 'rgb(66, 138, 255)',
+                data: tempData,
+            }]
+        },
+        options: {}
+    });
+}
+
 $(document).ready(function() {
     initializeObject();
+    drawChart();
     $("#goBtn").click(insertTime);
+    $("#goBtn").click(updateChart);
     $("#timeIn").keypress(function(e) {
-        if (e.keyCode == 13) insertTime();
+        if (e.keyCode == 13) {
+            insertTime();
+            updateChart();
+        }
     });
-    $(window).bind('beforeunload', updateCookie);
+    $(window).bind("beforeunload", updateCookie);
+    console.log(runTimes.times);
 });
 
 // TODO: Allow for different categories of times (like 1 mile, 13 mile, 26 mile)
