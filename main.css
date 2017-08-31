@@ -24,3 +24,7 @@ canvas {
     background-color: #efefef;
     border-radius: 5px;
 }
+
+.x {
+    cursor: pointer;
+}

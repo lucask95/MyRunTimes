@@ -114,9 +114,18 @@ function secondsToString(t) {
     return timeString;
 }
 
+function outputHistory() {
+    $("#timesOut").html("");
+    for (var i = 0; i < runTimes.times.length; i++) {
+        var text = "<div class=\"runtime\"><a class=\"x\" onclick=\"removeTime(" + i + ","
+            + runTimes.times[i] + ")\">x</a> " + secondsToString(runTimes.times[i]) + "</div>";
+        $("#timesOut").append(text);
+    }
+}
+
 // updates run time history output as well as run time data output
 function updateInfo() {
-    $("#timesOut").append("<div class=\"runtime\">" + secondsToString(runTimes.newTime) + "</div>");
+    outputHistory();
     var outputstring = "<ul>" +
         "<li><strong>Worst Time:</strong> " + secondsToString(runTimes.max) + "</li>" +
         "<li><strong>Best Time:</strong> " + secondsToString(runTimes.min) + "</li>" +
@@ -127,10 +136,22 @@ function updateInfo() {
     $("#infoOut").html(outputstring);
 }
 
+function removeTime(index, time) {
+    runTimes.times.splice(index, 1);
+    var sortedIndex = runTimes.sortedTimes.indexOf(time);
+    runTimes.sortedTimes.splice(sortedIndex, 1);
+    updateChart();
+    updateInfo();
+}
+
 // puts values into localStorage for use on subsequent visits to the page
 function updateCookie() {
     for (var key in runTimes)
         localStorage.setItem(key, runTimes[key]);
+    if (runTimes.times.length == 1) {
+        localStorage.setItem("times", String(runTimes.times[0]));
+        localStorage.setItem("sortedTimes", String(runTimes.sortedTimes[0]));
+    }
     localStorage.setItem("occurrances", JSON.stringify(runTimes.occurrances));
 }
 
@@ -152,8 +173,9 @@ function insertTime() {
 function initializeObject() {
     runTimes = new RunTime();
 
+    console.log(localStorage.getItem("times"));
     // if there is nothing in localStorage, then start with a new object
-    if (!(localStorage.getItem("timesSum")))
+    if (!(localStorage.getItem("times")) || localStorage.getItem("times") == "[]" || Number(localStorage.getItem("min")) == -1)
         return;
 
     // get data from localStorage
@@ -165,26 +187,21 @@ function initializeObject() {
     }
 
     // parse times & occurrances
-    runTimes.sortedTimes = runTimes.times.split(',').map(Number);
-    runTimes.times = runTimes.times.split(',').map(Number);
+    runTimes.times = String(runTimes.times).split(',').map(Number);
+    runTimes.sortedTimes = String(runTimes.sortedTimes).split(',').map(Number);
     runTimes.occurrances = JSON.parse(String(runTimes.occurrances));
-
-    // output run history except for most recent run, which will be appended
-    // after calling updateInfo()
-    for (var i = 0; i < runTimes.times.length; i++) {
-        if (i < runTimes.times.length - 1)
-            $("#timesOut").append("<div class=\"runtime\">" +
-                secondsToString(runTimes.times[i]) + "</div>");
-    }
 
     updateInfo();
 }
 
 function updateChart() {
-    console.log("updateChart");
+    console.log(runTimes.times);
     var tempData =  _.cloneDeep(runTimes.times);
+    var tempLabels = [];
+    for (var i = 0; i < tempData.length; i++)
+        tempLabels.push(String(i+1));
     myChart.data.datasets[0].data = tempData;
-    myChart.data.labels.push(String(runTimes.times.length));
+    myChart.data.labels = tempLabels;
     myChart.update();
 }
 
