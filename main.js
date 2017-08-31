@@ -62,7 +62,7 @@ class RunTime {
 
     push(n) {
         // inserts value so array stays sorted during insert. helps with median
-        this.sortedTimes.splice(_.sortedIndex(this.times, n), 0, n);
+        this.sortedTimes.splice(_.sortedIndex(this.sortedTimes, n), 0, n);
         this.times.push(n);
         this.timesSum += n;
         this.newTime = n;
@@ -181,17 +181,11 @@ function initializeObject() {
 }
 
 function updateChart() {
-    /*
-    console.log(runTimes.times);
+    console.log("updateChart");
     var tempData =  _.cloneDeep(runTimes.times);
-    var tempLabels = [];
-    for (var i = 0; i < runTimes.times.length; i++)
-        tempLabels.push(String(i+1));
-
     myChart.data.datasets[0].data = tempData;
-    myChart.labels = tempLabels;
+    myChart.data.labels.push(String(runTimes.times.length));
     myChart.update();
-    */
 }
 
 function drawChart() {
@@ -212,6 +206,7 @@ function drawChart() {
                 backgroundColor: 'rgba(0, 0, 0, 0)',
                 borderColor: 'rgb(66, 138, 255)',
                 data: tempData,
+                cubicInterpolationMode: 'monotone'
             }]
         },
         options: {}
@@ -230,10 +225,6 @@ $(document).ready(function() {
         }
     });
     $(window).bind("beforeunload", updateCookie);
-    console.log(runTimes.times);
 });
 
 // TODO: Allow for different categories of times (like 1 mile, 13 mile, 26 mile)
-// TODO: Display time history in graph. Possible libraries to use:
-//     chartjs: http://www.chartjs.org/docs/latest/getting-started/
-//     dimplejs: http://dimplejs.org/
