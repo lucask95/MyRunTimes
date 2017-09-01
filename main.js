@@ -52,12 +52,74 @@ class RunTime {
             this.median = this.sortedTimes[Math.floor((len) / 2)];
     }
 
+
     calcAll() {
         this.findMax();
         this.findMin();
         this.calcMean();
         this.findMedian();
         this.findMode();
+    }
+
+    // recalculate info when user removes a time
+    removeCalc() {
+        this.max = -1;
+        this.min = -1;
+        this.mean = -1;
+        this.median = -1;
+        this.mode = -1;
+        this.occurrances = {};
+        this.newTime = 0;
+        this.timesSum = 0;
+
+        for (var i = 0; i < this.times.length; i++) {
+            // max
+            if (this.times[i] > this.max)
+                this.max = this.times[i];
+
+            // min
+            if (this.min == -1 || this.times[i] < this.min)
+                this.min = this.times[i];
+
+            // mean
+            this.timesSum += this.times[i];
+
+            // mode
+            if (this.occurrances[this.times[i]] == undefined)
+                this.occurrances[this.times[i]] = 1;
+            else
+                this.occurrances[this.times[i]]++;
+        }
+
+        // mean
+        this.mean = this.timesSum / this.times.length;
+
+        // median
+        var len = this.sortedTimes.length;
+        if (len % 2 == 0)
+            this.median = (this.sortedTimes[len / 2] + this.sortedTimes[(len / 2) - 1]) / 2;
+        else
+            this.median = this.sortedTimes[Math.floor((len) / 2)];
+
+        // mode
+        for (var key in this.occurrances) {
+            if (this.occurrances[key] == undefined)
+                this.occurrances[key] = 1;
+            else
+                this.occurrances[key]++;
+            if (this.mode == -1 || this.occurrances[key] > this.occurrances[this.mode])
+                this.mode = Number(key);
+        }
+
+        // newTime
+        this.newTime = this.times[this.times.length - 1];
+    }
+
+    removeTime(index, time) {
+        this.times.splice(index, 1);
+        var sortedIndex = this.sortedTimes.indexOf(time);
+        this.sortedTimes.splice(sortedIndex, 1);
+        this.removeCalc();
     }
 
     push(n) {
@@ -118,8 +180,8 @@ function secondsToString(t) {
 function outputHistory() {
     $("#timesOut").html("");
     for (var i = 0; i < runTimes.times.length; i++) {
-        var text = "<div class=\"runtime\"><a class=\"x\" onclick=\"removeTime(" + i + ","
-            + runTimes.times[i] + ")\">x</a> " + secondsToString(runTimes.times[i]) + "</div>";
+        var text = "<div class=\"runtime\"><span class=\"x\" onclick=\"removeTime(" + i + ","
+            + runTimes.times[i] + ")\">x</span> " + secondsToString(runTimes.times[i]) + "</div>";
         $("#timesOut").append(text);
     }
 }
@@ -137,11 +199,9 @@ function updateInfo() {
     $("#infoOut").html(outputstring);
 }
 
-// TODO: Implement class function that removes the time and recalculates values
+// recalculate values when removing a time
 function removeTime(index, time) {
-    runTimes.times.splice(index, 1);
-    var sortedIndex = runTimes.sortedTimes.indexOf(time);
-    runTimes.sortedTimes.splice(sortedIndex, 1);
+    runTimes.removeTime(index, time);
     updateChart();
     updateInfo();
 }
@@ -166,7 +226,6 @@ function insertTime() {
         return;
     }
     runTimes.push(newTime);
-    console.log(runTimes.times);
     updateInfo();
 }
 
@@ -175,7 +234,6 @@ function insertTime() {
 function initializeObject() {
     runTimes = new RunTime();
 
-    console.log(localStorage.getItem("times"));
     // if there is nothing in localStorage, then start with a new object
     if (!(localStorage.getItem("times")) || localStorage.getItem("times") == "[]" || Number(localStorage.getItem("min")) == -1)
         return;
@@ -197,7 +255,6 @@ function initializeObject() {
 }
 
 function updateChart() {
-    console.log(runTimes.times);
     var tempData =  _.cloneDeep(runTimes.times);
     var tempLabels = [];
     for (var i = 0; i < tempData.length; i++)
