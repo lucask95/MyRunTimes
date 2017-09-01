@@ -52,7 +52,6 @@ class RunTime {
             this.median = this.sortedTimes[Math.floor((len) / 2)];
     }
 
-
     calcAll() {
         this.findMax();
         this.findMin();
@@ -61,16 +60,18 @@ class RunTime {
         this.findMode();
     }
 
-    // recalculate info when user removes a time
-    removeCalc() {
+    // remove time and recalculate info
+    removeTime(index, time) {
+        // remove time from arrays
+        this.times.splice(index, 1);
+        this.sortedTimes.splice(this.sortedTimes.indexOf(time), 1);
+
+        // update values
         this.max = -1;
         this.min = -1;
-        this.mean = -1;
-        this.median = -1;
-        this.mode = -1;
-        this.occurrances = {};
-        this.newTime = 0;
-        this.timesSum = 0;
+        this.newTime = this.times[this.times.length - 1];
+        this.occurrances[time]--;
+        this.timesSum -= time;
 
         for (var i = 0; i < this.times.length; i++) {
             // max
@@ -85,10 +86,8 @@ class RunTime {
             this.timesSum += this.times[i];
 
             // mode
-            if (this.occurrances[this.times[i]] == undefined)
-                this.occurrances[this.times[i]] = 1;
-            else
-                this.occurrances[this.times[i]]++;
+            if (this.occurrances[this.times[i]] > this.occurrances[this.mode])
+                this.mode = this.times[i];
         }
 
         // mean
@@ -100,26 +99,6 @@ class RunTime {
             this.median = (this.sortedTimes[len / 2] + this.sortedTimes[(len / 2) - 1]) / 2;
         else
             this.median = this.sortedTimes[Math.floor((len) / 2)];
-
-        // mode
-        for (var key in this.occurrances) {
-            if (this.occurrances[key] == undefined)
-                this.occurrances[key] = 1;
-            else
-                this.occurrances[key]++;
-            if (this.mode == -1 || this.occurrances[key] > this.occurrances[this.mode])
-                this.mode = Number(key);
-        }
-
-        // newTime
-        this.newTime = this.times[this.times.length - 1];
-    }
-
-    removeTime(index, time) {
-        this.times.splice(index, 1);
-        var sortedIndex = this.sortedTimes.indexOf(time);
-        this.sortedTimes.splice(sortedIndex, 1);
-        this.removeCalc();
     }
 
     push(n) {
@@ -176,7 +155,7 @@ function secondsToString(t) {
     return timeString;
 }
 
-// TODO: Put each time into its own div
+// outputs times that can be removed by clicking on the "x"
 function outputHistory() {
     $("#timesOut").html("");
     for (var i = 0; i < runTimes.times.length; i++) {
@@ -188,14 +167,17 @@ function outputHistory() {
 
 // updates run time history output as well as run time data output
 function updateInfo() {
+    var outputstring = "";
     outputHistory();
-    var outputstring = "<ul>" +
-        "<li><strong>Worst Time:</strong> " + secondsToString(runTimes.max) + "</li>" +
-        "<li><strong>Best Time:</strong> " + secondsToString(runTimes.min) + "</li>" +
-        "<li><strong>Mean Time:</strong> " + secondsToString(runTimes.mean) + "</li>" +
-        "<li><strong>Median Time:</strong> " + secondsToString(runTimes.median) + "</li>" +
-        "<li><strong>Mode Time:</strong> " + secondsToString(runTimes.mode) + "</li>" +
-        "</ul>";
+    if (runTimes.times.length > 0) {
+        var outputstring = "<ul>" +
+            "<li><strong>Worst Time:</strong> " + secondsToString(runTimes.max) + "</li>" +
+            "<li><strong>Best Time:</strong> " + secondsToString(runTimes.min) + "</li>" +
+            "<li><strong>Mean Time:</strong> " + secondsToString(runTimes.mean) + "</li>" +
+            "<li><strong>Median Time:</strong> " + secondsToString(runTimes.median) + "</li>" +
+            "<li><strong>Mode Time:</strong> " + secondsToString(runTimes.mode) + "</li>" +
+            "</ul>";
+    }
     $("#infoOut").html(outputstring);
 }
 
@@ -204,6 +186,7 @@ function removeTime(index, time) {
     runTimes.removeTime(index, time);
     updateChart();
     updateInfo();
+    console.log("removeTime", time, runTimes.times);
 }
 
 // puts values into localStorage for use on subsequent visits to the page
@@ -217,14 +200,20 @@ function updateCookie() {
     localStorage.setItem("occurrances", JSON.stringify(runTimes.occurrances));
 }
 
+// gets value from the input and processes it
 function insertTime() {
+    // get input and reset input box
     var inputString = $("#timeIn").val();
     $("#timeIn").val("");
+
+    // turn input string into number of seconds
     var newTime = processInput(inputString);
     if (newTime == -1) {
         alert("Invalid character in input.");
         return;
     }
+
+    // push new time to list
     runTimes.push(newTime);
     updateInfo();
 }
@@ -250,10 +239,9 @@ function initializeObject() {
     runTimes.times = String(runTimes.times).split(',').map(Number);
     runTimes.sortedTimes = String(runTimes.sortedTimes).split(',').map(Number);
     runTimes.occurrances = JSON.parse(String(runTimes.occurrances));
-
-    updateInfo();
 }
 
+// updates chart when user inputs or removes a value
 function updateChart() {
     var tempData =  _.cloneDeep(runTimes.times);
     var tempLabels = [];
@@ -264,6 +252,7 @@ function updateChart() {
     myChart.update();
 }
 
+// draws chart on the canvas
 function drawChart() {
     // initialize values that chart uses
     var tempData = _.cloneDeep(runTimes.times);
@@ -290,8 +279,13 @@ function drawChart() {
 }
 
 $(document).ready(function() {
+    // initialize the object and page
     initializeObject();
+    if (runTimes.times.length > 0)
+        updateInfo();
     drawChart();
+
+    // trigger functions when user clicks button or presses enter in input
     $("#goBtn").click(insertTime);
     $("#goBtn").click(updateChart);
     $("#timeIn").keypress(function(e) {
@@ -300,6 +294,8 @@ $(document).ready(function() {
             updateChart();
         }
     });
+
+    // update cookie when user leaves page for persistent data
     $(window).bind("beforeunload", updateCookie);
 });
 
