@@ -168,9 +168,8 @@ function outputHistory() {
 // updates run time history output as well as run time data output
 function updateInfo() {
     var outputstring = "";
-    outputHistory();
     if (runTimes.times.length > 0) {
-        var outputstring = "<ul>" +
+        outputstring = "<ul>" +
             "<li><strong>Worst Time:</strong> " + secondsToString(runTimes.max) + "</li>" +
             "<li><strong>Best Time:</strong> " + secondsToString(runTimes.min) + "</li>" +
             "<li><strong>Mean Time:</strong> " + secondsToString(runTimes.mean) + "</li>" +
@@ -179,6 +178,7 @@ function updateInfo() {
             "</ul>";
     }
     $("#infoOut").html(outputstring);
+    outputHistory();
 }
 
 // recalculate values when removing a time
