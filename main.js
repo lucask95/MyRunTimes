@@ -191,13 +191,7 @@ function removeTime(index, time) {
 
 // puts values into localStorage for use on subsequent visits to the page
 function updateCookie() {
-    for (var key in runTimes)
-        localStorage.setItem(key, runTimes[key]);
-    if (runTimes.times.length == 1) {
-        localStorage.setItem("times", String(runTimes.times[0]));
-        localStorage.setItem("sortedTimes", String(runTimes.sortedTimes[0]));
-    }
-    localStorage.setItem("occurrances", JSON.stringify(runTimes.occurrances));
+    localStorage.setItem("runTimesObject", JSON.stringify(runTimes));
 }
 
 // gets value from the input and processes it
@@ -224,21 +218,15 @@ function initializeObject() {
     runTimes = new RunTime();
 
     // if there is nothing in localStorage, then start with a new object
-    if (!(localStorage.getItem("times")) || localStorage.getItem("times") == "[]" || Number(localStorage.getItem("min")) == -1)
+    var storageObj = JSON.parse(String(localStorage.getItem("runTimesObject")));
+    if (!storageObj)
+        return;
+    else if(storageObj.times.length < 1)
         return;
 
     // get data from localStorage
-    for (var key in runTimes) {
-        // if the value can be parsed to a number, do so when getting the value,
-        // otherwise, just get the string
-        runTimes[key] = Number(localStorage.getItem(key)) ?
-            Number(localStorage.getItem(key)) : localStorage.getItem(key);
-    }
-
-    // parse times & occurrances
-    runTimes.times = String(runTimes.times).split(',').map(Number);
-    runTimes.sortedTimes = String(runTimes.sortedTimes).split(',').map(Number);
-    runTimes.occurrances = JSON.parse(String(runTimes.occurrances));
+    for (var key in runTimes)
+        runTimes[key] = storageObj[key];
 }
 
 // updates chart when user inputs or removes a value
