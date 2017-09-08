@@ -82,9 +82,6 @@ class RunTime {
             if (this.min == -1 || this.times[i] < this.min)
                 this.min = this.times[i];
 
-            // mean
-            this.timesSum += this.times[i];
-
             // mode
             if (this.occurrances[this.times[i]] > this.occurrances[this.mode])
                 this.mode = this.times[i];
@@ -186,7 +183,7 @@ function removeTime(index, time) {
     runTimes.removeTime(index, time);
     updateChart();
     updateInfo();
-    console.log("removeTime", time, runTimes.times);
+    console.log(runTimes);
 }
 
 // puts values into localStorage for use on subsequent visits to the page
@@ -210,6 +207,8 @@ function insertTime() {
     // push new time to list
     runTimes.push(newTime);
     updateInfo();
+
+    console.log(runTimes);
 }
 
 // retrieves values from localStorage so that user can continue
