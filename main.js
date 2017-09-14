@@ -183,7 +183,6 @@ function removeTime(index, time) {
     runTimes.removeTime(index, time);
     updateChart();
     updateInfo();
-    console.log(runTimes);
 }
 
 // puts values into localStorage for use on subsequent visits to the page
@@ -207,8 +206,6 @@ function insertTime() {
     // push new time to list
     runTimes.push(newTime);
     updateInfo();
-
-    console.log(runTimes);
 }
 
 // retrieves values from localStorage so that user can continue
@@ -218,9 +215,7 @@ function initializeObject() {
 
     // if there is nothing in localStorage, then start with a new object
     var storageObj = JSON.parse(String(localStorage.getItem("runTimesObject")));
-    if (!storageObj)
-        return;
-    else if(storageObj.times.length < 1)
+    if (!storageObj || storageObj.times.length < 1)
         return;
 
     // get data from localStorage
@@ -230,7 +225,7 @@ function initializeObject() {
 
 // updates chart when user inputs or removes a value
 function updateChart() {
-    var tempData =  _.cloneDeep(runTimes.times);
+    var tempData =  runTimes.times.slice();
     var tempLabels = [];
     for (var i = 0; i < tempData.length; i++)
         tempLabels.push(String(i+1));
@@ -242,7 +237,7 @@ function updateChart() {
 // draws chart on the canvas
 function drawChart() {
     // initialize values that chart uses
-    var tempData = _.cloneDeep(runTimes.times);
+    var tempData = runTimes.times.slice();
     var tempLabels = [];
     for (var i = 0; i < runTimes.times.length; i++)
         tempLabels.push(String(i+1));
